@@ -5,17 +5,19 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	var (
 		n = flag.Int("n", 10, "lines")
 		s = flag.Int("s", 0, "skip lines")
+		w = flag.String("w", "", "start from given word")
 	)
 	flag.Parse()
 	for i := 0; i < len(flag.Args()); i++ {
 		filepath := flag.Arg(i)
-		if len(os.Args) > 1 {
+		if len(flag.Args()) > 1 {
 			fmt.Printf("==> %s <==\n", filepath)
 		}
 		if !Exists(filepath) {
@@ -24,7 +26,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		Open(filepath, n, s)
+		Open(filepath, n, s, w)
 	}
 	os.Exit(0)
 }
@@ -34,7 +36,7 @@ func Exists(filepath string) bool {
 	return err == nil
 }
 
-func Open(filepath string, n *int, s *int) {
+func Open(filepath string, n *int, s *int, w *string) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		// exit code 1 unable to open target
@@ -45,6 +47,7 @@ func Open(filepath string, n *int, s *int) {
 
 	showed := 0
 	sc := bufio.NewScanner(file)
+	search := *w
 	for lines := 1; sc.Scan(); lines++ {
 		if err := sc.Err(); err != nil {
 			os.Exit(1)
@@ -52,6 +55,13 @@ func Open(filepath string, n *int, s *int) {
 		// skip showing until skip number
 		if lines < *s {
 			continue
+		}
+		if search != "" {
+			// -1 if not matches
+			if strings.Index(sc.Text(), search) == -1 {
+				continue
+			}
+			search = ""
 		}
 		fmt.Println(sc.Text())
 		showed++
