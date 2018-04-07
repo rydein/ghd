@@ -9,6 +9,15 @@ import (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stdout,
+			`Usage of %s:
+   %s [OPTIONS] [file ...]
+Options
+`, os.Args[0], os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	var (
 		n = flag.Int("n", 10, "lines")
 		s = flag.Int("s", 0, "skip lines")
