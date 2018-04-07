@@ -13,13 +13,28 @@ func main() {
 		s = flag.Int("s", 0, "skip lines")
 	)
 	flag.Parse()
-	filepath := flag.Arg(0)
-	if !Exists(filepath) {
-		// exit code 1 if file not exists
-		fmt.Printf("ghd: %s: No such file or directory\n", filepath)
-		os.Exit(1)
-	}
+	for i := 0; i < len(flag.Args()); i++ {
+		filepath := flag.Arg(i)
+		if len(os.Args) > 1 {
+			fmt.Printf("==> %s <==\n", filepath)
+		}
+		if !Exists(filepath) {
+			// exit code 1 if file not exists
+			fmt.Printf("ghd: %s: No such file or directory\n", filepath)
+			os.Exit(1)
+		}
 
+		Open(filepath, n, s)
+	}
+	os.Exit(0)
+}
+
+func Exists(filepath string) bool {
+	_, err := os.Stat(filepath)
+	return err == nil
+}
+
+func Open(filepath string, n *int, s *int) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		// exit code 1 unable to open target
@@ -28,7 +43,7 @@ func main() {
 	}
 	defer file.Close()
 
-	showed = 0
+	showed := 0
 	sc := bufio.NewScanner(file)
 	for lines := 1; sc.Scan(); lines++ {
 		if err := sc.Err(); err != nil {
@@ -42,12 +57,7 @@ func main() {
 		showed++
 		// show 10 lines by default
 		if showed == *n {
-			os.Exit(0)
+			break
 		}
 	}
-}
-
-func Exists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
 }
