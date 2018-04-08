@@ -74,11 +74,12 @@ func Open(filepath string, n *int, s *int, w *string) {
 			}
 			search = ""
 		}
-		fmt.Println(sc.Text())
-		showed++
 		// show 10 lines by default
 		if showed == *n {
 			break
 		}
+
+		fmt.Println(sc.Text())
+		showed++
 	}
 }
