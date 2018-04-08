@@ -24,20 +24,22 @@ Options
 		w = flag.String("w", "", "start from given word")
 	)
 	flag.Parse()
+	exitStatus := 0
 	for i := 0; i < len(flag.Args()); i++ {
 		filepath := flag.Arg(i)
-		if len(flag.Args()) > 1 {
-			fmt.Printf("==> %s <==\n", filepath)
-		}
 		if !Exists(filepath) {
 			// exit code 1 if file not exists
 			fmt.Printf("ghd: %s: No such file or directory\n", filepath)
-			os.Exit(1)
+			exitStatus = 1
+			continue
 		}
 
+		if len(flag.Args()) > 1 {
+			fmt.Printf("==> %s <==\n", filepath)
+		}
 		Open(filepath, n, s, w)
 	}
-	os.Exit(0)
+	os.Exit(exitStatus)
 }
 
 func Exists(filepath string) bool {
